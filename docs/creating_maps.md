@@ -4,7 +4,7 @@
 
 Each CTF map submission must include:
 
-1. **Frontend** - A web application serving the map
+1. **Frontend** - A web application serving the map (This is Optional if Flags are not "Front-Dependent" + having at least a LandPage for each map with proper writings and ... is interesting)
 2. **Flags Configuration** - JSON file defining tasks and expected answers  
 3. **Agent Example** - Demonstration that flags are solvable
 
