@@ -75,7 +75,8 @@ if __name__ == "__main__":
     
     html_content = get_html_from_server()
     if not html_content:
-        print("Failed to fetch HTML from server. Make sure the server is running on http://localhost:8000")
+        print("Failed to fetch HTML from server.")
+        print("Start the server first: cd frontend && python server.py")
         exit(1)
     
     print("Executing task with Pydantic structured output...")
