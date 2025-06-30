@@ -1,3 +1,5 @@
+Current Contest Landpage: https://kaleidoscopic-chimera-5f72ff.netlify.app/
+
 # CTF Map Template
 
 A template for creating LLM Agent CTF contest maps.
