@@ -1,5 +1,6 @@
 Current Contest Landpage: https://kaleidoscopic-chimera-5f72ff.netlify.app/
-You can contribute with creating a fork of this project. Model of contest is: gpt-4.1-mini
+
+You can contribute by creating a fork of this project. Model of contest is: gpt-4.1-mini
 
 
 # CTF Map Template
