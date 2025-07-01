@@ -33,19 +33,27 @@ pip install -r requirements.txt
 ## Testing Your Map
 
 ```bash
-# Quick test of the example map
-python3 test_example.py
+# Quickest test - from project root
+python3 run_example.py
+
+# OR run from example map directory
+cd example_map
+python3 test_setup.py
 
 # Manual testing:
-# 1. Start the server
+# 1. Set your OpenAI API key
+export OPENAI_API_KEY="your-api-key-here"
+
+# 2. Start the server
 cd example_map/frontend
 python3 server.py
 
-# 2. Test with agent (in another terminal)
+# 3. Test with agent (in another terminal)
 cd example_map
+export OPENAI_API_KEY="your-api-key-here"
 python3 agent_example.py
 
-# 3. Validate your map
+# 4. Validate your map
 python3 utils/validate_map.py example_map/
 ```
 

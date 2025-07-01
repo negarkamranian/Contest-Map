@@ -1,13 +1,9 @@
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 app = FastAPI()
-
-# Mount static files (for CSS, JS, images)
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configure Jinja2Templates
 templates = Jinja2Templates(directory="templates")
@@ -18,7 +14,8 @@ async def read_root(request: Request):
 
 @app.post("/submit_flag")
 async def submit_flag(flag: str = Form(...)):
-    pass
+    # This endpoint could be used for flag submission in the future
+    return {"message": "Flag received", "flag": flag}
 
 if __name__ == "__main__":
     import uvicorn
