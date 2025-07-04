@@ -1,275 +1,671 @@
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="en" x-data="{ room: 'floorplan' }">
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دیوار - آگهی‌های رایگان خرید و فروش کالا و خدمات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <title>Sonata of Secrets – Escape House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js for lightweight interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- QRCode.js library for client-side QR rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Font Awesome for musical icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-p7o+Tq4Y+4Zk57vCrR6NqBJ38qJNmPR9U1FVLtZL1NVr7Di5urN6byjHgNsx3Rp3XIan+FJxuxMxDPZWS9yhiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        body {
-            font-family: 'Vazirmatn', sans-serif;
+        body { font-family: 'Inter', sans-serif; }
+        /* Subtle parchment-like background */
+        body::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          background: linear-gradient(135deg, #2e1c0f 0%, #4a2e1c 100%);
+          opacity: 0.85;
+          z-index: -1;
+        }
+        .hidden { display: none; }
+        
+        /* House-like structure */
+        .house-frame {
+          background: rgba(0,0,0,0.15);
+          border-radius: 20px;
+          padding: 8px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+          border: 2px solid #8b5e3c;
+        }
+        
+        .room-window {
+          background: rgba(255,255,255,0.95);
+          border: 4px solid #8b5e3c;
+          border-radius: 15px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        /* Floor Plan Styling */
+        .floor-plan {
+          background: #062648;
+          /* Blueprint grid */
+          background-image: 
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 40px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 40px);
+          border: 4px solid #ffffff;
+          border-radius: 12px;
+          position: relative;
+          width: 100%;
+          max-width: 900px;
+          height: 700px;
+          margin: 0 auto;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          overflow: hidden;
+        }
+        
+        .room-area {
+          position: absolute;
+          border: 3px solid #ffffff;
+          background: transparent;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          text-align: center;
+          border-radius: 10px;
+          font-size: 11px;
+          color: #ffffff;
+        }
+        
+        .room-area:hover {
+          background: rgba(255,255,255,0.1);
+          transform: translateY(-2px);
+          box-shadow: 0 0 10px rgba(255,255,255,0.6);
+          z-index: 10;
+        }
+        
+        /* Room positions and sizes - redesigned layout */
+        /* Ground Floor */
+        .piano-room { top: 80px; left: 60px; width: 180px; height: 140px; background: rgba(255,200,200,0.9); }
+        .rhythm-room { top: 80px; left: 260px; width: 150px; height: 100px; background: rgba(200,200,255,0.9); }
+        .gallery-room { top: 80px; right: 60px; width: 160px; height: 140px; background: rgba(255,200,255,0.9); }
+        
+        /* Upper Floor */
+        .loft-room { top: 250px; left: 80px; width: 140px; height: 120px; background: rgba(200,255,200,0.9); }
+        .library-room { top: 250px; right: 80px; width: 150px; height: 120px; background: rgba(255,220,200,0.9); }
+        
+        /* Study Area */
+        .study-room { bottom: 120px; left: 120px; width: 160px; height: 100px; background: rgba(255,255,200,0.9); }
+        .notebook-room { bottom: 120px; right: 120px; width: 140px; height: 100px; background: rgba(220,220,220,0.9); }
+        
+        /* Additional rooms */
+        .entrance-hall { bottom: 40px; left: 300px; width: 120px; height: 60px; background: rgba(245,245,220,0.9); }
+        .balcony { top: 40px; left: 300px; width: 100px; height: 30px; background: rgba(144,238,144,0.9); border-radius: 15px; }
+        
+        /* Hallway/corridor styling */
+        .hallway {
+          position: absolute;
+          background: rgba(255,255,255,0.05);
+          border-radius: 0;
+          border: 1px dashed rgba(255,255,255,0.4);
+        }
+        
+        .hallway-h { height: 20px; }
+        .hallway-v { width: 20px; }
+        
+        /* Stairs */
+        .stairs {
+          position: absolute;
+          width: 40px;
+          height: 60px;
+          background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255,255,255,0.7) 6px 12px);
+          border: 2px solid #ffffff;
+          border-radius: 0;
+        }
+        
+        /* Windows */
+        .window {
+          position: absolute;
+          width: 20px;
+          height: 30px;
+          background: rgba(255,255,255,0.1);
+          border: 2px solid #ffffff;
+        }
+        
+        /* Door indicators */
+        .door {
+          position: absolute;
+          width: 20px;
+          height: 4px;
+          background: #8B4513;
+          border-radius: 2px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        /* Floor labels */
+        .floor-label {
+          position: absolute;
+          font-size: 10px;
+          font-weight: bold;
+          color: #654321;
+          background: rgba(255,255,255,0.8);
+          padding: 2px 6px;
+          border-radius: 10px;
+          border: 1px solid #654321;
+        }
+        
+        /* Decorative elements */
+        .garden {
+          position: absolute;
+          background: radial-gradient(circle, #90EE90 30%, #228B22 70%);
+          border-radius: 50%;
+        }
+        
+        .fountain {
+          position: absolute;
+          width: 30px;
+          height: 30px;
+          background: radial-gradient(circle, #87CEEB 40%, #4682B4 70%);
+          border-radius: 50%;
+          border: 2px solid #654321;
+        }
+        
+        /* Musical staff lines */
+        .staff-lines {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 100px;
+          background-image: 
+            linear-gradient(to right, #000 0%, #000 100%),
+            linear-gradient(to right, #000 0%, #000 100%),
+            linear-gradient(to right, #000 0%, #000 100%),
+            linear-gradient(to right, #000 0%, #000 100%),
+            linear-gradient(to right, #000 0%, #000 100%);
+          background-size: 100% 1px;
+          background-position: 0 20px, 0 35px, 0 50px, 0 65px, 0 80px;
+          background-repeat: no-repeat;
+          opacity: 0.1;
+          z-index: 1;
+        }
+        
+        /* Floating musical notes */
+        .floating-notes {
+          position: absolute;
+          font-size: 24px;
+          color: rgba(0,0,0,0.1);
+          z-index: 1;
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .note-1 { top: 10px; left: 10%; animation-delay: 0s; }
+        .note-2 { top: 30px; right: 15%; animation-delay: 1s; }
+        .note-3 { bottom: 20px; left: 20%; animation-delay: 2s; }
+        .note-4 { bottom: 40px; right: 10%; animation-delay: 3s; }
+        .note-5 { top: 50%; left: 5%; animation-delay: 4s; }
+        .note-6 { bottom: 60px; right: 25%; animation-delay: 5s; }
+        
+        /* Room-specific decorations */
+        .piano-keys {
+          background: linear-gradient(90deg, 
+            white 0%, white 14%, 
+            black 14%, black 16%, 
+            white 16%, white 30%, 
+            black 30%, black 32%, 
+            white 32%, white 46%, 
+            white 46%, white 60%, 
+            black 60%, black 62%, 
+            white 62%, white 76%, 
+            black 76%, black 78%, 
+            white 78%, white 92%, 
+            black 92%, black 94%, 
+            white 94%, white 100%);
+          height: 40px;
+          border-radius: 5px;
+          margin: 10px 0;
+          box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .metronome-swing {
+          display: inline-block;
+          animation: swing 2s ease-in-out infinite;
+          transform-origin: top center;
+        }
+        
+        @keyframes swing {
+          0%, 100% { transform: rotate(-5deg); }
+          50% { transform: rotate(5deg); }
+        }
+        
+        .music-box {
+          background: linear-gradient(45deg, #8B4513, #D2691E);
+          border-radius: 10px;
+          padding: 15px;
+          margin: 10px 0;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .vinyl-record {
+          width: 60px;
+          height: 60px;
+          background: radial-gradient(circle, #000 20%, #333 40%, #000 60%);
+          border-radius: 50%;
+          display: inline-block;
+          margin: 5px;
+          position: relative;
+          animation: spin 10s linear infinite;
+        }
+        
+        .vinyl-record::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 8px;
+          height: 8px;
+          background: #000;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+        }
+        
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        .diary-page {
+          background: #FFF8DC;
+          border-left: 3px solid #CD853F;
+          padding: 15px;
+          margin: 10px 0;
+          box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+          position: relative;
+        }
+        
+        .diary-page::before {
+          content: '';
+          position: absolute;
+          left: 20px;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: #FFB6C1;
+        }
+        
+        /* Treble clef decoration */
+        .treble-clef {
+          font-size: 48px;
+          color: rgba(139, 69, 19, 0.3);
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          z-index: 1;
+        }
+        
+        /* Navigation styling */
+        .nav-button {
+          padding: 8px 16px;
+          border: 1px solid #8b5e3c;
+          border-radius: 25px;
+          background: rgba(255,255,255,0.12);
+          transition: all 0.3s ease;
+          backdrop-filter: blur(10px);
+          color: #f5f5f5;
+        }
+        
+        .nav-button:hover {
+          background: rgba(255,255,255,0.2);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* === Dark Piano-Brown Theme Overrides === */
+        header {
+          background: #3b2416;
+          color: #f5f5f5;
+        }
+        header h1 {
+          color: #f5f5f5;
+        }
+
+        footer {
+          background: #3b2416;
+          color: #d1c7bc;
+        }
+
+        .bass-clef {
+          font-size: 48px;
+          color: rgba(139, 69, 19, 0.25);
+          position: absolute;
+          bottom: 20px;
+          left: 20px;
+          z-index: 1;
         }
     </style>
+    <!-- === Notebook Logic (Alpine.js component) === -->
+    <script>
+      document.addEventListener('alpine:init', () => {
+        Alpine.data('notebookData', () => ({
+          activeTab: 0,
+          inputs: ['', '', '', ''],
+          solution: [],
+          showFlag: false,
+          init() {
+            const colours = ['red','blue','green','purple'];
+            this.solution = colours.map(c => {
+              const el = document.querySelector(`[data-lock="${c}"]`);
+              return el ? el.textContent.trim() : '';
+            });
+          },
+          isSolved() {
+            return this.inputs.every((v, i) => v === this.solution[i]);
+          },
+          submit() {
+            this.showFlag = this.isSolved();
+          }
+        }));
+      });
+    </script>
+    <!-- === Escape-room Puzzle Logic === -->
+    <script>
+      document.addEventListener('alpine:init', () => {
+        /* Map puzzle (Green) */
+        Alpine.data('mapData', () => ({
+          sequence: [],
+          target: ['piano','gallery','loft','library'],
+          solved: false,
+          hiddenDigit: '',
+          svgMap: '',
+          loading: false,
+          async init() {
+            await this.loadMap();
+          },
+          async loadMap() {
+            this.loading = true;
+            try {
+              const response = await fetch('/api/map', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+              });
+              const data = await response.json();
+              
+              if (data.success) {
+                this.svgMap = data.svg_map;
+                this.target = data.solution_sequence;
+                this.hiddenDigit = data.hidden_digit || '';
+              }
+            } catch (error) {
+              console.error('Error loading map:', error);
+            } finally {
+              this.loading = false;
+            }
+          },
+          roomClick(room) {
+            if (this.solved) return;
+            this.sequence.push(room);
+            // If the current pick already diverged from the solution at any position, reset immediately
+            const wrongIndex = this.sequence.findIndex((v,i)=>v!==this.target[i]);
+            if (wrongIndex !== -1) {
+              // Brief visual feedback could be added here; for now simply reset
+              this.sequence = [];
+              return;
+            }
+            // When we have the required length, check for full success
+            if (this.sequence.length === this.target.length) {
+              this.solved = true;
+              // Show melody line on the map
+              const melodyLine = document.getElementById('melody-line');
+              if (melodyLine) melodyLine.style.opacity = '1';
+            }
+          }
+        }));
+
+        /* Catalogue puzzle (Purple) */
+        Alpine.data('catalogueData', () => ({
+          query: '',
+          result: '',
+          solved: false,
+          loading: false,
+          items: [],
+          async init() {
+            const res = await fetch('/api/catalogue');
+            const d = await res.json();
+            this.items = d.catalogue || [];
+          },
+          search() {
+            if (!this.query.trim()) return;
+            this.result = `You entered: \"${this.query}\". Compare with the catalogue list above and decide which index (1-5) is closest in meaning. That index is your digit.`;
+            this.solved = false;
+          }
+        }));
+      });
+    </script>
+    <!-- lock_order: red, blue, green, purple -->
+    <script>
+      /* Client-side download for dummy review text (Lock 2) */
+      document.addEventListener('DOMContentLoaded', () => {
+        const dummyText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod tempor ipsum, at pretium eros ornare a.\n\n... (trimmed) ...\n\nsecret-digit: 8\n`; // shortened placeholder text
+        const blob = new Blob([dummyText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.getElementById('downloadReview');
+        if (link) {
+          link.href = url;
+          link.setAttribute('download', 'dummy_review.txt');
+        }
+
+        // Generate QR code in Music-Box Loft (no server route required)
+        const qrTarget = document.getElementById('qrCode');
+        if (qrTarget && window.QRCode) {
+          new QRCode(qrTarget, {
+            text: 'piano-gallery-loft-library',
+            width: 128,
+            height: 128,
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+      });
+    </script>
 </head>
-    <body class="bg-gray-100 font-sans">
-        <header class="bg-white shadow-md p-4">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-gray-800">دیوار</h1>
-                <nav>
-                    <ul class="flex space-x-4 space-x-reverse">
-                        <li>
-                            <a
-                                href="#"
-                                class="text-gray-600 hover:text-blue-600"
-                                >آگهی‌ها</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                href="#"
-                                class="text-gray-600 hover:text-blue-600"
-                                >شهر من: تهران</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                href="#"
-                                class="text-gray-600 hover:text-blue-600"
-                                >ورود/ثبت‌نام</a
-                            >
-                        </li>
-                    </ul>
+    <body class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="shadow flex items-center justify-between px-6 py-4">
+            <h1 class="text-2xl font-bold">Ava's Sonata &#9836;</h1>
+            <nav class="space-x-3">
+                <button class="nav-button" :class="{ 'text-gray-800 font-semibold': room==='floorplan' }" @click="room='floorplan'">🏠 Floor Plan</button>
+                <button class="nav-button" :class="{ 'text-red-600 font-semibold': room==='piano' }" @click="room='piano'">🎹 Piano</button>
+                <button class="nav-button" :class="{ 'text-blue-600 font-semibold': room==='rhythm' }" @click="room='rhythm'">🕰️ Rhythm</button>
+                <button class="nav-button" :class="{ 'text-green-600 font-semibold': room==='loft' }" @click="room='loft'">📦 Music-Box</button>
+                <button class="nav-button" :class="{ 'text-purple-600 font-semibold': room==='gallery' }" @click="room='gallery'">🖼️ Gallery</button>
+                <button class="nav-button" :class="{ 'text-gray-800 font-semibold': room==='notebook' }" @click="room='notebook'">📔 Notebook</button>
                 </nav>
-            </div>
         </header>
 
-        <main class="container mx-auto mt-8 p-4">
-            <section class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">
-                    جستجو در آگهی‌ها
-                </h2>
-                <div class="flex space-x-4 space-x-reverse">
-                    <input
-                        type="text"
-                        placeholder="جستجو..."
-                        class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                    >
-                        جستجو
-                    </button>
-                </div>
+        <!-- Main content wrapper -->
+        <main class="flex-1 mx-auto w-full max-w-5xl p-6 space-y-8 house-frame">
+            <!-- Floor Plan View -->
+            <section x-show="room==='floorplan'" class="room-window p-6">
+                <div class="staff-lines"></div>
+                <div class="floating-notes note-1">♪</div>
+                <div class="floating-notes note-2">♫</div>
+                <div class="floating-notes note-3">♬</div>
+                <div class="floating-notes note-4">♪</div>
+                <div class="floating-notes note-5">♩</div>
+                <div class="floating-notes note-6">𝅘𝅥</div>
+                <div class="treble-clef">𝄞</div>
+                <h2 class="text-xl font-semibold mb-2">The Story</h2>
+                <p>Ava, a gifted pianist, vanished after performing a haunting nocturne. Her house now whispers secrets through six musical locks guarding her final note. Explore each room in the order presented above. Only when every riddle is understood will the velvet notebook open.</p>
             </section>
 
-            <section
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            >
-                <!-- First Laptop - Target for the task -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <div class="relative">
-                        <img
-                            src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                            alt="لپ‌تاپ"
-                            class="w-full h-48 object-cover"
-                        />
-                        <div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                            فوری
-                        </div>
+            <!-- Rooms -->
+            <!-- Piano Room -->
+            <section x-show="room==='piano'" class="room-window p-6 border-l-4 border-red-400">
+                <div class="staff-lines"></div>
+                <div class="floating-notes note-1">♪</div>
+                <div class="floating-notes note-2">♫</div>
+                <div class="floating-notes note-3">♬</div>
+                <div class="floating-notes note-4">♪</div>
+                <div class="floating-notes note-5">♩</div>
+                <div class="floating-notes note-6">𝅘𝅥</div>
+                <div class="treble-clef">𝄞</div>
+                <h3 class="text-lg font-semibold mb-3">Piano Room (Lock 1 – Red)</h3>
+                <p>An open score glows beneath the lamp, displaying a fragment from Bach's <em>St&nbsp;John Passion</em>. Your eyes fall on the figured-bass riddle below.</p>
+                <img src="/static/image.png" alt="Figured-bass exercise" class="mx-auto my-4 max-w-full shadow-lg ring-2 ring-gray-300 rounded">
+                <p class="mt-4">Which of the suggested options is the correct figured bass for the indicated chord in this realisation?</p>
+                <!-- LOCK DIGIT 1 -->
+                <p class="hidden" data-lock="red">1</p>
+                <div class="bass-clef">𝄢</div>
+            </section>
+
+            <!-- Rhythm Room -->
+            <section x-show="room==='rhythm'" class="room-window p-6 border-l-4 border-blue-400">
+                <div class="staff-lines"></div>
+                <div class="floating-notes note-1">♬</div>
+                <div class="floating-notes note-3">♪</div>
+                <div class="floating-notes note-5">♩</div>
+                <h3 class="text-lg font-semibold mb-3">Rhythm Room (Lock 2 – Blue)</h3>
+                <div class="space-y-3">
+                  <p>You power up Ava's dusty <em>1700-series</em> terminal. A frozen webpage of a 1717 concert review flickers into life.</p>
+                  <pre class="p-3 bg-gray-100 rounded text-xs overflow-x-auto max-h-32">
+Stirring performance by the young Ava Thornfield was nothing short of extraordinary. Her rendition of the <em>Lamentations in A Minor</em> left the audience in rapturous silence.
+                  </pre>
+                  <a id="downloadReview" href="#" class="underline text-blue-600">Download full review text</a>
+                </div>
+                <!-- LOCK DIGIT 2 -->
+                <p class="hidden" data-lock="blue">8</p>
+                <div class="bass-clef">𝄢</div>
+            </section>
+
+            <!-- Music-Box Loft -->
+            <section x-show="room==='loft'" class="room-window p-6 border-l-4 border-green-500">
+                <div class="staff-lines"></div>
+                <div class="floating-notes note-2">♫</div>
+                <div class="floating-notes note-4">♪</div>
+                <div class="floating-notes note-6">𝅘𝅥</div>
+                <h3 class="text-lg font-semibold mb-3">Music-Box Loft (Lock 3 – Green)</h3>
+                <div x-data="mapData()" class="space-y-4">
+                  <p>An architect's blueprint of the mansion unrolls on a stand, dotted with QR-code <em>note</em> icons.</p>
+                  <div id="qrCode" class="flex justify-center my-4"></div>
+                  
+                  <!-- SVG Map Display -->
+                  <div x-show="svgMap" class="border-2 border-gray-300 rounded-lg p-4 bg-blue-50">
+                    <div x-html="svgMap"></div>
+                  </div>
+                  
+  
+                  
+                  <template x-if="solved">
+                    <div class="bg-green-100 border border-green-400 p-3 rounded">
+                      <p class="text-emerald-700 font-semibold">✓ The melody line glows across the map, revealing the code!</p>
+                      <p class="text-sm mt-1">Digit revealed: <span class="font-mono text-lg" x-text="hiddenDigit"></span></p>
                     </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            لپ‌تاپ ASUS VivoBook 15
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۳۵,۰۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            Core i5 - 8GB RAM - 512GB SSD
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، تجریش - ۳۰ دقیقه پیش
-                        </p>
-                    </div>
+                  </template>
+                </div>
+                <!-- LOCK DIGIT 3 -->
+                <p class="hidden" data-lock="green">6</p>
+                <div class="bass-clef">𝄢</div>
+            </section>
+
+            <!-- Gallery -->
+            <section x-show="room==='gallery'" class="room-window p-6 border-l-4 border-purple-500">
+                <div class="staff-lines"></div>
+                <div class="floating-notes note-1">♪</div>
+                <div class="floating-notes note-3">♬</div>
+                <div class="floating-notes note-5">♩</div>
+                <h3 class="text-lg font-semibold mb-3">Gallery (Lock 4 – Purple)</h3>
+                <div class="space-y-3">
+                  <p class="italic">"I have keys, but I can't open any doors. I'm often black and white, yet I create colorful scores. What am I?"</p>
+                  <p class="text-sm">(Figure out the answer to the riddle first. Then inspect the embeddings below and determine which vector is most similar to that answer. The one-based position of that word is the purple digit.)</p>
+
+                  <pre class="bg-gray-100 p-3 rounded text-[10px] overflow-x-auto">
+{
+  "0":   [0.112, -0.044,  0.513, -0.220, 0.431], 
+  "1":   [-0.172, 0.310, -0.058, 0.499, -0.124], 
+  "2":   [0.389,  0.201,  0.602, -0.130, 0.288], 
+  "3":   [0.512,  0.455,  0.687, -0.012, 0.506], 
+  "4":   [0.091,  0.002,  0.477, -0.281, 0.333], 
+  "5":  [-0.233, 0.421, -0.140, 0.612, -0.090], 
+  "6":  [0.460,  0.382,  0.640, -0.042, 0.490], 
+  "7":    [-0.210, 0.344, -0.101, 0.533, -0.067], 
+  "8":    [0.215,  0.148,  0.350, -0.095, 0.260], 
+  "9":  [0.301,  0.192,  0.521, -0.080, 0.312]
+}
+                  </pre>
+                  <!-- {
+                        "violin":   
+                        "canvas":   
+                        "orchestra":
+                        "keyboard": 
+                        "flute":   
+                        "palette":
+                        "pianist":  
+                        "easel":   
+                        "stage":   
+                        "concert": 
+                      } -->
+                                          
+                  <p class="text-xs text-gray-600">(Embeddings produced with MiniLM-L6-v2, rounded to 3 decimals for brevity.)</p>
+                </div>
+                <!-- LOCK DIGIT 4 -->
+                <p class="hidden" data-lock="purple">5</p>
+                <div class="bass-clef">𝄢</div>
+            </section>
+
+            <!-- Velvet Notebook (Final Flag) -->
+            <section x-show="room==='notebook'" x-data="notebookData()" class="room-window p-6">
+                <div class="staff-lines"></div>
+                <div class="floating-notes note-1">♪</div>
+                <div class="floating-notes note-2">♫</div>
+                <div class="floating-notes note-3">♬</div>
+                <div class="floating-notes note-4">♪</div>
+                <div class="floating-notes note-5">♩</div>
+                <div class="floating-notes note-6">𝅘𝅥</div>
+                <div class="treble-clef">𝄞</div>
+
+                <h3 class="text-lg font-semibold mb-3">Velvet Notebook</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                  Enter the four-digit code by selecting each lock's tab and typing its digit.
+                </p>
+
+                <!-- Tabs -->
+                <div class="mb-4">
+                  <div class="flex space-x-2 mb-2">
+                    <template x-for="(label, idx) in ['Red','Blue','Green','Purple']" :key="idx">
+                      <button type="button"
+                        class="px-3 py-1 rounded text-xs font-semibold transition"
+                        :class="activeTab === idx ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-800'"
+                        x-text="label"
+                        @click="activeTab = idx"></button>
+                    </template>
+                  </div>
+
+                  <!-- Input field for current tab -->
+                  <div class="border p-4 rounded bg-gray-50 text-center">
+                    <input type="number" min="0" max="9" class="w-16 text-center text-2xl font-mono border-b border-gray-600 focus:outline-none"
+                      x-model="inputs[activeTab]" @input="inputs[activeTab] = $event.target.value.slice(-1)">
+                    <p class="text-xs mt-2" x-text="'Enter the ' + ['red','blue','green','purple'][activeTab] + ' digit'"></p>
+                  </div>
                 </div>
 
-                <!-- Second Laptop -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <div class="relative">
-                        <img
-                            src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                            alt="لپ‌تاپ"
-                            class="w-full h-48 object-cover"
-                        />
-                        <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                            نو
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            لپ‌تاپ HP Pavilion Gaming
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۴۲,۰۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            Core i7 - 16GB RAM - GTX 1650
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، ولنجک - ۱ ساعت پیش
-                        </p>
-                    </div>
+                <div class="text-center mt-4">
+                  <button class="px-4 py-2 bg-gray-800 text-white rounded shadow hover:bg-gray-700 transition" @click="submit()">Submit Code</button>
                 </div>
 
-                <!-- Mobile Phone -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <img
-                        src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        alt="موبایل"
-                        class="w-full h-48 object-cover"
-                    />
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            موبایل سامسونگ Galaxy A52
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۸,۵۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            128GB - دوربین 64 مگاپیکسل
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، ونک - ۱ ساعت پیش
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Third Laptop -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <img
-                        src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        alt="لپ‌تاپ"
-                        class="w-full h-48 object-cover"
-                    />
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            لپ‌تاپ MacBook Air M1
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۵۸,۰۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            Apple M1 - 8GB RAM - 256GB SSD
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، نیاوران - ۲ ساعت پیش
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Car -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <img
-                        src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        alt="ماشین"
-                        class="w-full h-48 object-cover"
-                    />
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            پراید ۱۳۱ مدل ۱۳۹۹
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۲۰۰,۰۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            کارکرد: ۱۲۰,۰۰۰ کیلومتر
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، سعادت‌آباد - ۳ ساعت پیش
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Fourth Laptop -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <div class="relative">
-                        <img
-                            src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                            alt="لپ‌تاپ"
-                            class="w-full h-48 object-cover"
-                        />
-                        <div class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                            تخفیف
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            لپ‌تاپ Lenovo ThinkPad E15
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۳۸,۵۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            Core i5 - 8GB RAM - 1TB HDD
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، پاسداران - ۴ ساعت پیش
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Apartment - Contains the flag -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <img
-                        src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        alt="آپارتمان"
-                        class="w-full h-48 object-cover"
-                    />
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            آپارتمان ۷۰ متری در پونک
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۳,۵۰۰,۰۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            ۲ خواب - طبقه ۳ - آسانسور
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، پونک - ۵ ساعت پیش
-                        </p>
-                        <!-- The easy flag is hidden here. An LLM might find it by looking for unusual comments or patterns. -->
-                        <p class="hidden">
-                            flag_hint: The flag is
-                            divar_ctf{easy_peasy_lemon_squeezy}
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Fifth Laptop -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-                    <img
-                        src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        alt="لپ‌تاپ"
-                        class="w-full h-48 object-cover"
-                    />
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                            لپ‌تاپ گیمینگ MSI GF63
-                        </h3>
-                        <p class="text-gray-600 mb-2 font-bold text-lg">
-                            قیمت: ۴۵,۰۰۰,۰۰۰ تومان
-                        </p>
-                        <p class="text-sm text-gray-500 mb-2">
-                            Core i7 - 16GB RAM - RTX 3050
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            تهران، شهرک غرب - ۶ ساعت پیش
-                        </p>
-                    </div>
-                </div>
+                <!-- Flag reveal -->
+                <template x-if="showFlag">
+                  <p id="flag-note" class="bg-emerald-50 border border-emerald-200 p-4 rounded shadow text-sm">
+                    Dear beloved,<br/>
+                    In silence, our duet lives on.<br/>
+                    Flag: "♩𝄞♯♭♪𝄞♯♯♭♪♩𝄞"
+                  </p>
+                </template>
             </section>
         </main>
+
+        <footer class="text-center text-xs py-4 text-gray-500">© Sonata of Secrets</footer>
     </body>
 </html>
